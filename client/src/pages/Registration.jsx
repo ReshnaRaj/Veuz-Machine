@@ -28,6 +28,9 @@ const Registration = () => {
   const closeModal = () => setOpenModal(false);
 
   const nextStep = () => {
+    if (currentStep === 1) {
+      if (!validateForm()) return; // Block navigation
+    }
     if (currentStep === 3) {
       navigate("/summary"); // Go to summary page
     } else {
@@ -35,6 +38,58 @@ const Registration = () => {
     }
   };
   const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    country: "",
+    region: "",
+    email: "",
+    confirmEmail: "",
+    nationality: "",
+    mobileCode: "",
+    mobileNumber: "",
+    companyName: "",
+    jobTitle: "",
+    companyType: "",
+    industry: "",
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    setErrors({ ...errors, [field]: "" }); // clear error on change
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.firstName) newErrors.firstName = "First name is required";
+    if (!formData.lastName) newErrors.lastName = "Last name is required";
+    if (!formData.country) newErrors.country = "Country is required";
+    if (!formData.region) newErrors.region = "Region is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.confirmEmail)
+      newErrors.confirmEmail = "Confirm Email is required";
+    if (
+      formData.email &&
+      formData.confirmEmail &&
+      formData.email !== formData.confirmEmail
+    )
+      newErrors.confirmEmail = "Emails do not match";
+    if (!formData.nationality)
+      newErrors.nationality = "Nationality is required";
+    if (!formData.mobileNumber)
+      newErrors.mobileNumber = "Mobile Number is required";
+    if (!formData.companyName)
+      newErrors.companyName = "Company Name is required";
+    if (!formData.jobTitle) newErrors.jobTitle = "Job Title is required";
+    if (!formData.companyType)
+      newErrors.companyType = "Company Type is required";
+    if (!formData.industry) newErrors.industry = "Industry is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   return (
     <>
@@ -87,7 +142,11 @@ const Registration = () => {
 
                 {/* White Form Body */}
                 <div className="p-4 space-y-6">
-                  <RegistrationForm />
+                  <RegistrationForm
+                    formData={formData}
+                    errors={errors}
+                    handleChange={handleChange}
+                  />
 
                   {/* Checkboxes Section */}
                   <div>
